@@ -72,6 +72,7 @@ public class PaymentService {
         //PaymentEvent 저장
         PaymentEvent paymentEvent = PaymentEvent.builder()
                 .checkoutId(checkoutId)
+                .userId(reservation.getUserId())
                 .reservationId(reservation.getReservationId())
                 .reservationKey(reservationKey)
                 .pspType("TOSS")
@@ -128,5 +129,12 @@ public class PaymentService {
                 .orElseThrow();
 
         return new PaymentConfirmResponse(paymentEvent.getReservationKey());
+    }
+
+    //폴링 : 결제상태확인
+    public String getPaymentStatus(String orderId){
+        PaymentOrder paymentOrder = paymentOrderRepository.findById(orderId)
+                .orElseThrow(()-> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
+        return paymentOrder.getPaymentOrderStatus().name();
     }
 }
